@@ -1,112 +1,78 @@
-Estrutura de Dados - Simulação de Truco Mineiro em C++
-Este projeto foi desenvolvido para a disciplina de Estrutura de Dados e tem como objetivo aplicar os conceitos de Listas (Estática, Encadeada Simples e Duplamente Encadeada) na simulação de um jogo de cartas, especificamente o Truco Mineiro.
+# 🃏 Truco Mineiro em C++
 
-🎯 Objetivo
-O foco principal do trabalho é implementar, a partir do zero, diferentes tipos de listas para gerenciar as mecânicas centrais de um jogo de baralho: a criação e o embaralhamento de um deck de cartas, a distribuição dessas cartas aos jogadores e o controle das rodadas, onde cada jogador descarta uma carta por vez.
+Este projeto é uma implementação para a disciplina de Estrutura de Dados, desenvolvido em C++, que simula a distribuição e as rodadas de um jogo de Truco Mineiro utilizando diferentes tipos de listas.
 
-🃏 O Jogo: Truco Mineiro
-Para contextualizar a aplicação das estruturas de dados, o jogo escolhido foi o Truco Mineiro. As seguintes regras e características foram consideradas para a simulação:
+## 🎮 Como Jogar
 
-Baralho (1): Utiliza-se um baralho limpo, contendo 40 cartas (excluindo-se 8, 9, 10 e coringas).
+- Ao iniciar o jogo, informe as **dimensões do campo** (máximo de 30x30) e a **quantidade de bombas**.
+- Clique com o botão esquerdo para revelar um campo.
+- Clique com o botão direito para **marcar** uma bomba com uma bandeira 🚩.
+- O jogo termina quando:
+  - Você revela todas as células **sem bombas** (vitória).
+  - Você clica em uma bomba (derrota).
 
-Jogadores (Variável): O programa é projetado para suportar um número variável de jogadores, a ser definido no início da execução.
+## 🎯 Objetivo do Projeto
 
-Cartas por Jogador (Fixo): Cada jogador recebe 3 cartas no início de cada mão.
+- O objetivo deste trabalho é implementar e aplicar na prática as sistemáticas de distribuição de cartas e o controlo de rodadas de uma partida de baralho. Para isso, serão desenvolvidas do zero as seguintes estruturas de dados:
 
-Rodadas (Variável): Uma "mão" completa consiste em até 3 rodadas. A simulação executará um número pré-definido de mãos para demonstrar o funcionamento.
+  - Lista Estática
+  - Lista Encadeada Simples
+  - Lista Duplamente Encadeada
 
-O projeto se concentra na logística do jogo (distribuição e descarte), não sendo necessário implementar a contagem de pontos ou a lógica de vitória, embora um sistema simples possa ser adicionado como um bônus.
+## ⚙️ Regras da Simulação
+- A simulação é baseada numa versão simplificada do Truco Mineiro com as seguintes regras:
 
-🛠️ Estruturas de Dados Implementadas
-O núcleo do projeto consiste na criação dos seguintes Tipos Abstratos de Dados (TADs) em C++:
+  - Baralho: Utiliza-se um baralho de 40 cartas (são removidas as cartas 8, 9 e 10).
+  - Jogadores: O programa permite um número variável de jogadores, definido no início da execução.
+  - Distribuição: Cada jogador recebe 3 cartas no início de cada mão.
+  - Rodadas: Uma mão é composta por 3 rodadas, onde cada jogador descarta uma carta por vez.
+  - Foco: A simulação concentra-se na manipulação das estruturas (criar baralho, embaralhar, distribuir, descartar), sem implementar a lógica de pontuação ou vitória.
 
-1. TAD Lista Estática
-Implementação de uma lista baseada em um array de tamanho fixo.
+## 🛠️ Estruturas Implementadas
+- O projeto é dividido nos seguintes Tipos Abstratos de Dados (TADs):
 
-Operações:
+  - Listas: Ficheiros ListaEstatica.h, ListaEncadeada.h, e ListaDuplamente.h com as operações de inserir, remover, obter, verificar, procurar e imprimir.
 
-InicializarLista(): Prepara a lista para uso.
+- TADs do Jogo:
 
-Inserir(item, posicao): Adiciona um item no início, fim ou em uma posição específica.
+  - Carta.h: Modela uma carta com valor e naipe.
+  - Baralho.h: Gerencia o conjunto de 40 cartas.
+  - Jogador.h: Representa um jogador e a sua "mão" de cartas.
 
-Remover(posicao): Retira um item do início, fim ou de uma posição específica.
+## 📁 Estrutura do Projeto
+```plaintext
+truco-mineiro-cpp/
+├── main.cpp
+├── ListaEstatica.h
+├── ListaEstatica.cpp
+├── ListaEncadeada.h
+├── ListaEncadeada.cpp
+├── ListaDuplamente.h
+├── ListaDuplamente.cpp
+├── Carta.h
+├── Carta.cpp
+├── Baralho.h
+├── Baralho.cpp
+├── Jogador.h
+└── Jogador.cpp
+```
 
-ObterItem(posicao): Retorna o dado de uma posição, se ela for válida.
+## ▶️ Executando o Projeto
 
-ContemItem(item): Verifica se um dado específico existe na lista.
+### Pré-requisitos
+- É necessário ter um compilador C++, como o G++, instalado no sistema.
 
-DescobrirIndice(item): Retorna a posição de um dado, se ele existir na lista.
-
-ImprimirLista(): Exibe todos os elementos da lista.
-
-2. TAD Lista Encadeada Simples
-Implementação de uma lista dinâmica onde cada elemento aponta para seu sucessor.
-
-Operações: Possui as mesmas operações da Lista Estática.
-
-3. TAD Lista Duplamente Encadeada
-Implementação de uma lista dinâmica onde cada elemento aponta para seu sucessor e seu predecessor.
-
-Operações: Possui as mesmas operações das listas anteriores.
-
-4. TADs de Domínio da Aplicação
-Para modelar o jogo, foram criados os seguintes TADs:
-
-Carta: Representa uma carta individual, com atributos para valor (A, 2, 3, 4, 5, 6, 7, Q, J, K) e naipe (Ouros, Espadas, Copas, Paus).
-
-Baralho: Gerencia o conjunto de 40 cartas, utilizando uma das listas implementadas para permitir as operações de embaralhar e distribuir.
-
-Jogador: Modela um jogador, contendo um nome ou ID e uma mao (uma lista para armazenar suas 3 cartas).
-
-⚙️ Funcionamento da Simulação
-O programa será executado de forma automática, sem interação do usuário após a configuração inicial, avançando ao pressionar de uma tecla para facilitar a visualização. Os passos são:
-
-Configuração Inicial: Define-se o número de jogadores que participarão da partida.
-
-Criação do Baralho: O baralho é instanciado e preenchido com as 40 cartas.
-
-Embaralhamento: O baralho é desordenado para garantir a aleatoriedade.
-
-Distribuição de Cartas: O programa remove as cartas do topo do baralho e as insere na mão de cada jogador, sequencialmente, até que todos tenham 3 cartas.
-
-Simulação das Rodadas:
-
-Para cada uma das 3 rodadas da mão:
-
-Cada jogador "joga" (remove) uma carta de sua mão.
-
-A ação é registrada em um log.
-
-Log de Rodadas: Ao final de cada mão, um relatório é impresso no console, detalhando as jogadas. Exemplo:
-
-================== MÃO 1 ==================
-[LOG] Rodada 1:
-  - Jogador 1 descartou: 4 de Paus
-  - Jogador 2 descartou: 7 de Copas
-[LOG] Rodada 2:
-  - Jogador 1 descartou: Ás de Espadas
-  - Jogador 2 descartou: 2 de Ouros
-...
-===========================================
-
-🚀 Como Compilar e Executar
-Esta seção será atualizada com os comandos finais.
-
-Pré-requisitos:
-
-Um compilador C++, como o G++.
-
-Comando de Compilação (Exemplo):
-
+### Compilando o projeto
+- Utilize o seguinte comando no terminal para compilar todos os ficheiros .cpp e gerar um executável chamado truco:
+```bash
 g++ -o truco *.cpp
+```
 
-Comando de Execução (Exemplo):
-
+### Executando a simulação
+Após a compilação, execute o programa com o comando:
+```bash
 ./truco
+```
 
-👨‍💻 Autores
-[Seu Nome Completo] - [Sua Matrícula]
-
-[Nome do Colega 1] - [Matrícula]
-
-[Nome do Colega 2] - [Matrícula]
+## 👨‍💻 Autores
+Wallacy Alvarenga - 6916694
