@@ -1,10 +1,56 @@
+#define TAM_MAO 3
 #include "carta.h"
 #include <iostream>
 using namespace std;
 
 struct No{
     Carta info;
-    No *elo;
+    No *elo = nullptr;
+
+    void inicializar(){
+        elo = nullptr;
+    }
+     
+    bool inserir(Carta &carta){
+        if(contar() >= TAM_MAO) return false;
+
+        No *no = new No();
+        no->inicializar();
+        carta.gerarLabel();
+        no->info = carta;
+
+        return true;
+    }
+
+    bool remover(Carta *carta){
+        No *no = buscar(carta);
+        
+        if(no == nullptr) return false;
+
+
+    }
+
+    No *buscar(Carta *carta){
+        No *aux = elo;
+
+        while(aux->info.label != carta->label || aux != nullptr){
+            aux = aux->elo;
+        }
+
+        return aux;
+    }
+
+    int contar(){
+        No *aux = elo;
+        int i = 0;
+
+        while(aux != nullptr){
+            aux = aux->elo;
+            i++;
+        }
+
+        return i;
+    }
 };
 
 struct Mao{
@@ -12,7 +58,7 @@ struct Mao{
 
     //Inicializar lista
     bool inicializar(){
-
+        fim = nullptr;
     };
 
     //Inserir na lista (início, posição, fim);
@@ -42,6 +88,11 @@ struct Mao{
 
     //Imprimir lista
     void imprimir(){
+
+    };
+
+    //contar
+    int contar(){
 
     };
 
