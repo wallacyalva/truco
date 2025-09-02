@@ -26,7 +26,7 @@ struct Mesa{
     };
 
     //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir);
-    Carta pegar(){
+    Jogador pegar(){
     
     };
 

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 using namespace std;
+#include "estruturas/mesa.h"
+#include "estruturas/baralho.h"
 
 
 void mostrarRegras() {
@@ -55,6 +57,48 @@ void selecionarJogador(int &players){
 }
 
 bool jogo(int &opcoes, int &jogadores){
+    
+    Mesa mesa;
+    Baralho baralho;
+
+    mesa.inicializar();
+    cout << "Mesa iniciada \n";
+
+    baralho.gerarCartas();
+    cout << "Cartas criadas e adicionadas ao baralho \n";
+
+    baralho.embaralhar();
+    cout << "Baralho embaralhado \n";
+    
+    //quantidade de cartas na mao
+    for (int j = 0; j < 3; j++){
+        //quantidade de jogadores na mesa
+        for (int i = 0; i < jogadores; i++){
+            if(j == 0){
+                mesa.inserir(i);
+                cout << "adiconado jogador de index:" << i << " \n";
+            }
+            Jogador jogador = mesa.pegar(i);
+            cout << "Pegado jogador de index:" << i << ". com o nome de:" << jogador.nome <<" \n";
+            Carta carta = baralho.pegar(0);
+            cout << "Pegado a carta de cima do baralho:" << carta.label << " \n";
+            jogador.mao.inserir(carta);
+            cout << "Adicionado a carta: " << carta.label << ". a mao do jogador: " << jogador.nome << " \n";
+            jogador.mao.imprimir();
+            baralho.remover(carta);
+            cout << "retirado a carta: " << carta.label << "do baralho \n";
+            cout << "cartas atuais do baralho: \n";
+            baralho.imprimir();
+        }
+    }
+
+
+
+    
+
+
+
+
     
     return true;
 }

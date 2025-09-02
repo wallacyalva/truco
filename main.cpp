@@ -4,7 +4,7 @@
 using namespace std;
 
 int main() {
-    srand(time(NULL)); // Inicializa o gerador de números aleatórios
+    // srand(time(NULL)); // Inicializa o gerador de números aleatórios
     int opcoes = 0,jogadores = 2;
     do{
         switch (opcoes){
