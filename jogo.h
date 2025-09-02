@@ -66,9 +66,11 @@ bool jogo(int &opcoes, int &jogadores){
 
     baralho.gerarCartas();
     cout << "Cartas criadas e adicionadas ao baralho \n";
+    baralho.imprimir();
 
     baralho.embaralhar();
     cout << "Baralho embaralhado \n";
+    baralho.imprimir();
     
     //quantidade de cartas na mao
     for (int j = 0; j < 3; j++){
@@ -92,7 +94,21 @@ bool jogo(int &opcoes, int &jogadores){
         }
     }
 
+    int pontos1 = 0;
+    int pontos2 = 0;
 
+    do{
+        int maos1 = 0;
+        int maos2 = 0;
+        do{
+            
+
+
+        } while (maos1 != 2 || maos2 != 2);
+
+    } while (pontos1 != 12 || pontos2 != 12);
+    
+    
 
     
 

@@ -21,7 +21,6 @@ struct Baralho{
         if(index >= TAM_BARALHO){
             return false;
         }
-
         // Lista vazia
         if(ultimo == -1){
             Cartas[0] = carta;
@@ -41,7 +40,7 @@ struct Baralho{
         }
         // Inserir sem ordenar
         else{
-            Cartas[ultimo + 1] = carta;
+            Cartas[index] = carta;
         }
 
         ultimo = index;
