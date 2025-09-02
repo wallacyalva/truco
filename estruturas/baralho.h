@@ -22,12 +22,8 @@ struct Baralho{
             return false;
         }
 
-        // Lista vazia
-        if(ultimo == -1){
-            Cartas[0] = carta;
-        }
         // Inserir ordenado
-        else if(ordenar){
+        if(ordenar){
             int ultimoIndex = ultimo;
             while(ultimoIndex != -1){
                 if(Cartas[ultimoIndex].numero > carta.numero){
@@ -41,7 +37,7 @@ struct Baralho{
         }
         // Inserir sem ordenar
         else{
-            Cartas[ultimo + 1] = carta;
+            Cartas[index] = carta;
         }
 
         ultimo = index;
