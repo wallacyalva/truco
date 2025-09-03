@@ -6,51 +6,6 @@ using namespace std;
 struct No{
     Carta info;
     No *elo = nullptr;
-
-    void inicializar(){
-        elo = nullptr;
-    }
-     
-    bool inserir(Carta &carta){
-        if(contar() >= TAM_MAO) return false;
-
-        No *no = new No();
-        no->inicializar();
-        carta.gerarLabel();
-        no->info = carta;
-
-        return true;
-    }
-
-    bool remover(Carta *carta){
-        No *no = buscar(carta);
-        
-        if(no == nullptr) return false;
-
-
-    }
-
-    No *buscar(Carta *carta){
-        No *aux = elo;
-
-        while(aux->info.label != carta->label || aux != nullptr){
-            aux = aux->elo;
-        }
-
-        return aux;
-    }
-
-    int contar(){
-        No *aux = elo;
-        int i = 0;
-
-        while(aux != nullptr){
-            aux = aux->elo;
-            i++;
-        }
-
-        return i;
-    }
 };
 
 struct Mao{

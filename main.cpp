@@ -14,8 +14,12 @@ int main() {
             system("cls");
             case 1:
                 /* Play Game*/
-                if(jogo(opcoes,jogadores)){
-                    cout << "Fim de jogo, o jogo será encerrado, até a proxima :)\n";
+                if(jogo(jogadores)){
+                    cout << "Fim de jogo, Pressione qualquer tecla para encerrar o jogo, até a proxima :)\n";
+                    cin.ignore();
+                    cout<< cin.get();
+                    cout<<"\033c";
+                    opcoes = 4;
                 }
                 break;
             case 2:
