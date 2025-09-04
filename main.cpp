@@ -1,17 +1,22 @@
 #include "jogo.h"
 #include <iostream>
 #include <string>
+#include <windows.h>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 int main() {
+    SetConsoleOutputCP(65001);
     // srand(time(NULL)); // Inicializa o gerador de números aleatórios
     int opcoes = 0,jogadores = 2;
     do{
+        cout << "\033c";
+        cout << "Selecione uma das opções a seguir: \n 1 • Jogar ▷\n 2 • Sobre ⁉️\n 3 • Jogadores \n 4 • Fim 𝕏\n";
+        cin >> opcoes;
+        system("cls");
+
         switch (opcoes){
-            cout << "\033c";
-            cout << "Selecione uma das opções a seguir: \n 1 • Jogar ▷\n 2 • Sobre ⁉️\n 3 • Jogadores \n 4 • Fim 𝕏\n";
-            cin >> opcoes;
-            system("cls");
             case 1:
                 /* Play Game*/
                 if(jogo(jogadores)){
@@ -35,7 +40,7 @@ int main() {
                 opcoes = 4;
             break;
         }
-    } while (opcoes == 4);
- 
+    } while (opcoes != 4);
+
     return 0;
 }

@@ -99,8 +99,9 @@ struct Baralho{
     //Imprimir lista
     void imprimir(){
         for( int i=0; i <= ultimo; i++ ){
-            cout << Cartas[i].label << " ";
+            cout << Cartas[i].label << " " << ((i == ultimo) ? "\n" : "");
         }
+        
     };
 
     void gerarCartas(){

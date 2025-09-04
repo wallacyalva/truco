@@ -135,7 +135,9 @@ bool jogo(int jogadores){
     cout << "Mesa iniciada \n";
     //adiciona os jogadores a mesa
     for (int i = 0; i < jogadores; i++){
-        mesa.inserir(i);
+        Jogador jogador;
+        jogador.nome = "Jogador " + to_string(i + 1);
+        mesa.inserir(jogador);
         cout << "adiconado jogador de index:" << i << " \n";
     }
     
@@ -155,7 +157,7 @@ bool jogo(int jogadores){
         for (int j = 0; j < 3; j++){
             //quantidade de jogadores na mesa
             for (int i = 0; i < jogadores; i++){
-                Jogador jogador = mesa.pegar(i);
+                Jogador& jogador = mesa.pegar(i);
                 cout << "Pegado jogador de index:" << i << ". com o nome de:" << jogador.nome <<" \n";
                 Carta carta = baralho.pegar(0);
                 cout << "Pegado a carta de cima do baralho:" << carta.label << " \n";
@@ -182,8 +184,10 @@ bool jogo(int jogadores){
             for (int i = 0; i < jogadores; i++){
                 Jogador jogador = mesa.pegar(i);
                 cout << "Vez do jogador:" << jogador.nome << " \n";
-                int indexCarta = rand() % (2 - round);
-                Carta carta = jogador.mao.pegar(indexCarta);
+                int numCartasNaMao = jogador.mao.contar();
+                cout << numCartasNaMao << "index carta \n";
+                Carta carta = jogador.mao.pegar(numCartasNaMao);
+                cout << "pegou a carta:" << carta.label << " \n";
                 //se for o primeiro ele esta ganhando
                 if(i == 0){
                     jogadorGanhando = i;
@@ -204,7 +208,7 @@ bool jogo(int jogadores){
                 }
                 cout << "O jogador jogou a carta:" << carta.label << " \n";
                 baralho.inserir(carta);
-                jogador.mao.remover(indexCarta);
+                jogador.mao.remover(carta);
                 jogador.mao.imprimir();
             }
 
