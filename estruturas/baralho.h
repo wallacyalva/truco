@@ -66,11 +66,11 @@ struct Baralho{
     };
     
     //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir)
-    Carta pegar(int index){
+    Carta& pegar(int index){
         if(index <= ultimo && index >= 0){
             return Cartas[index];
         }
-        return Carta {0, 0, "Carta Invalida"};
+        return Cartas[0];
     };
     
     //Contém item – recebe o dado e verifica se ele está na lista. Se estiver, retorna verdadeiro e falso caso contrário
@@ -98,6 +98,7 @@ struct Baralho{
 
     //Imprimir lista
     void imprimir(){
+        cout << "Imprimindo cartas do baralho:\n";
         for( int i=0; i <= ultimo; i++ ){
             cout << Cartas[i].label << " " << ((i == ultimo) ? "\n" : "");
         }

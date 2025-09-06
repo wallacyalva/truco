@@ -67,11 +67,11 @@ struct Mao{
     };
 
     //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir);
-    Carta pegar(int index){
+    Carta& pegar(int index){
         if(index <= ultimo && index >= 0){
             return cartas[index];
         }
-        return Carta {0, 0, "Carta Invalida"};
+        return cartas[0];
     };
 
     //Contém item – recebe o dado e verifica se ele está na lista. Se estiver, retorna verdadeiro, falso caso contrário; 
@@ -99,6 +99,7 @@ struct Mao{
 
     //Imprimir lista
     void imprimir(){
+        cout << "Imprimindo cartas na mao do jogador:\n";
         for( int i=0; i <= ultimo; i++ ){
             cout << cartas[i].label << " "<< ((i == ultimo) ? "\n" : "");
         }

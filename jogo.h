@@ -116,7 +116,7 @@ void selecionarJogador(int &players){
     cout << "Quantidade atual é: " << players << "\n";
     cout << "Selecione a quantidade de jogadores:\n";
     cin >> players;
-    if(players != 2 || players != 4){
+    if(players != 2 && players != 4){
         players = 2;
     }
     cout << "Jogadores definidos como " << players << ".\n";
@@ -148,6 +148,13 @@ bool jogo(int jogadores){
     int pontos2 = 0;
 
     do{
+        cout << "Placar: Time 1 (" << pontos1 << ") x (" << pontos2 << ") Time 2\n";
+
+        // Antes de distribuir novas cartas, é preciso resetar a mão de cada jogador.
+        for (int i = 0; i < jogadores; i++){
+            mesa.pegar(i).mao.inicializar();
+        }
+
         baralho.embaralhar();
         cout << "Baralho embaralhado \n";
         baralho.imprimir();
@@ -182,17 +189,16 @@ bool jogo(int jogadores){
             int jogadorGanhando = 0;
             //certifica de cada jogador faze sua jogada na mao
             for (int i = 0; i < jogadores; i++){
-                Jogador jogador = mesa.pegar(i);
+                Jogador& jogador = mesa.pegar(i);
                 cout << "Vez do jogador:" << jogador.nome << " \n";
                 int numCartasNaMao = jogador.mao.contar();
                 cout << numCartasNaMao << "index carta \n";
-                Carta carta = jogador.mao.pegar(numCartasNaMao);
+                Carta carta = jogador.mao.pegar(rand() % numCartasNaMao);
                 cout << "pegou a carta:" << carta.label << " \n";
                 //se for o primeiro ele esta ganhando
                 if(i == 0){
                     jogadorGanhando = i;
                     cartaGanhando = carta;
-                    melada = false;
                 }else{
                     //verifica à partir da regra se a carta matou ou nao
                     int resultado = compararCartas(cartaGanhando,carta);
@@ -235,7 +241,7 @@ bool jogo(int jogadores){
             }
             
             round++;
-        } while (maos1 != 2 || maos2 != 2 || round != 3);
+        } while (maos1 < 2 && maos2 < 2 && round < 3);
 
         if(maos1 == 2){
             if(jogadores == 2){
@@ -256,7 +262,7 @@ bool jogo(int jogadores){
         }else if(round != 3){
             cout << "O roud ficou melado (ninguem pontua)\n";
         }
-    } while (pontos1 != 12 || pontos2 != 12);
+    } while (pontos1 < 12 && pontos2 < 12);
     
     if(pontos1 > pontos2){
         if(jogadores == 2){

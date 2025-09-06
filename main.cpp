@@ -1,14 +1,14 @@
 #include "jogo.h"
 #include <iostream>
 #include <string>
-#include <windows.h>
+// #include <windows.h>
 #include <cstdlib>
 #include <ctime>
 using namespace std;
 
 int main() {
-    SetConsoleOutputCP(65001);
-    // srand(time(NULL)); // Inicializa o gerador de números aleatórios
+    // SetConsoleOutputCP(65001);
+    srand(time(NULL)); // Inicializa o gerador de números aleatórios
     int opcoes = 0,jogadores = 2;
     do{
         cout << "\033c";

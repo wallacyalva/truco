@@ -99,6 +99,7 @@ struct Mesa{
 
     //Imprimir lista
     void imprimir(){
+        cout << "Imprimindo jogadores na mesa:\n";
         for( int i=0; i <= ultimo; i++ ){
             cout << jogadores[i].nome << " " << ((i == ultimo) ? "\n" : "");
         }
