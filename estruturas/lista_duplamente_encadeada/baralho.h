@@ -37,53 +37,57 @@
             nova->dados = carta;
             nova->eloAnt = nullptr;
             nova->eloProx = nullptr;
+            
+            // Lista vazia
+            if(comeco == nullptr){
+                comeco = nova;
+                fim = nova;
+                tamanho += 1;
+                return true;
+            }
 
             if(ordenar){
-                
-                if(comeco == nullptr){ // Lista vazia
-                    comeco = nova;
-                    fim = nova;
-                    return true;
-                }
-                
-                if(carta.numero > comeco->dados.numero){ // Inser��o no come�o
+
+                // Inserção no começo (novo valor é o maior)
+                if(carta.numero > comeco->dados.numero){
                     nova->eloProx = comeco;
                     comeco->eloAnt = nova;
                     comeco = nova;
+                    tamanho += 1;
                     return true;
                 }
 
-                if(carta.numero < fim->dados.numero){ // Inser��o no final
+                // Inserção no final (novo valor é o menor)
+                if(carta.numero < fim->dados.numero){
                     fim->eloProx = nova;
                     nova->eloAnt = fim;
                     fim = nova;
+                    tamanho += 1;
                     return true;
                 }
 
-                // Inser��o no meio da lista
-                NoCarta *ant = comeco;
-                NoCarta *prox = ant->eloProx;
-                while(prox != nullptr){
-                    if(ant->dados.numero > carta.numero && carta.numero > prox->dados.numero){
-                        ant->eloProx = nova;
-                        nova->eloAnt = ant;
-                        prox->eloAnt = nova;
-                        nova->eloProx = prox;
-                        return true;
-                    }
-                    ant = prox;
-                    prox = ant->eloProx;
+                // Inserção no meio da lista
+                NoCarta *atual = comeco;
+                while(atual->eloProx != nullptr && atual->eloProx->dados.numero > carta.numero){
+                    atual = atual->eloProx;
                 }
+                
+                // Insere nova depois de atual
+                nova->eloProx = atual->eloProx;
+                if (atual->eloProx != nullptr) {
+                    atual->eloProx->eloAnt = nova;
+                }
+                atual->eloProx = nova;
+                nova->eloAnt = atual;
+                
+                tamanho += 1;
+                return true;
             }else{
-                if(comeco == nullptr){ // Lista est� vazia
-                    comeco = nova;
-                    fim = nova;
-                }else{
-                    fim->eloAnt = nova;
-                    nova->eloProx = fim;
-                    fim = nova;
-                }
-
+                // Inserção não ordenada (sempre no fim)
+                fim->eloProx = nova;
+                nova->eloAnt = fim;
+                fim = nova;
+                tamanho += 1;
                 return true;
             }
             return false;
@@ -102,6 +106,7 @@
                 comeco = nullptr;
                 fim = nullptr;
                 delete aux;
+                tamanho -= 1;
                 return true;
             }
             // Retirando o primeiro
@@ -109,6 +114,7 @@
                 comeco = aux->eloProx;
                 comeco->eloAnt = nullptr;
                 delete aux;
+                tamanho -= 1;
                 return true;
             }
 
@@ -118,6 +124,7 @@
                 ant->eloProx = nullptr;
                 fim = ant;
                 delete aux;
+                tamanho -= 1;
                 return true;
             }
             // Retirando do meio
@@ -125,19 +132,24 @@
             ant->eloProx = prox;
             prox->eloAnt = ant;
             delete aux;
+            tamanho -= 1;
             return true;
         };
         
         //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir)
         Carta& pegar(int index){
             NoCarta *referencia = comeco;
+
+            //Eveita bugs
+            if (index < 0 || index >= tamanho || comeco == nullptr) {
+                return comeco->dados;
+            }
+
             if(index == 0){
                 return referencia->dados;
             }
             
-            int indexReferencia = 0;
-
-            while(indexReferencia != index){
+            for(int i = 0; i < index; i++){
                 referencia = referencia->eloProx;
             }
 
@@ -203,49 +215,63 @@
 
         // Função para embaralhar as cartas do baralho
         void embaralhar(){
-            if (tamanho >= 2) {
-                NoCarta* referenciaComeco = nullptr;
-                NoCarta* referenciaFim = nullptr;
-                int index = tamanho;
-    
-                for (int i = 0; i < tamanho; i++) {
-                    // índice aleatório do que resta da lista original
-                    int k = rand() % index;
-    
-                    // remove o nó da lista original
-                    NoCarta* anterior = nullptr;
-                    NoCarta* atual = comeco;
-                    for (int j = 0; j < k; j++) {
-                        anterior = atual;
-                        atual = atual->eloProx;
-                    }
-    
-                    //nó da lista original
-                    if (anterior == nullptr) { 
-                        //primeiro elemento
-                        comeco = atual->eloProx;
-                    } else {
-                        anterior->eloProx = atual->eloProx;
-                    }
-    
-                    //nó removido ao final da nova lista embaralhada
-                    atual->eloProx = nullptr; // Isola o nó
-                    if (referenciaComeco == nullptr) { 
-                        // Nova lista está vazia
-                        referenciaComeco = atual;
-                        referenciaFim = atual;
-                    } else {
-                        referenciaFim->eloProx = atual;
-                        referenciaFim = atual;
-                    }
-    
-                    index--;
+            if (tamanho < 2){
+                return;
+            };
+
+            Baralho temp; // Cria uma lista temporária
+            int contagemAtual = tamanho;
+
+            for (int i = 0; i < tamanho; i++) {
+                int posAleatoria = rand() % contagemAtual;
+                
+                // Pega o nó na posição aleatória
+                NoCarta* noEscolhido = comeco;
+                for(int j=0; j < posAleatoria; j++){
+                    noEscolhido = noEscolhido->eloProx;
                 }
-    
-                // nova lista embaralhada se torna a lista do baralho
-                comeco = referenciaComeco;
-                fim = referenciaFim;
+
+                // Remove o nó da lista original (this)
+                if(noEscolhido == comeco){
+                    comeco = noEscolhido->eloProx;
+                }
+
+                if(noEscolhido == fim){
+                    fim = noEscolhido->eloAnt;
+                }
+
+                if(noEscolhido->eloAnt != nullptr){
+                    noEscolhido->eloAnt->eloProx = noEscolhido->eloProx;
+                }
+
+                if(noEscolhido->eloProx != nullptr){
+                    noEscolhido->eloProx->eloAnt = noEscolhido->eloAnt;
+                }
+
+                // Insere o nó na lista temporária
+                if(temp.comeco == nullptr){
+                    temp.comeco = noEscolhido;
+                    temp.fim = noEscolhido;
+                    noEscolhido->eloAnt = nullptr;
+                    noEscolhido->eloProx = nullptr;
+                } else {
+                    temp.fim->eloProx = noEscolhido;
+                    noEscolhido->eloAnt = temp.fim;
+                    noEscolhido->eloProx = nullptr;
+                    temp.fim = noEscolhido;
+                }
+
+                contagemAtual--;
             }
+
+            // A lista temporária (já embaralhada) torna-se a lista oficial
+            comeco = temp.comeco;
+            fim = temp.fim;
+            tamanho = tamanho; // Restaura o tamanho original
+
+            // Anula os ponteiros da lista temporária para evitar que o destrutor dela apague os nossos nós
+            temp.comeco = nullptr;
+            temp.fim = nullptr;
         };
 
     };

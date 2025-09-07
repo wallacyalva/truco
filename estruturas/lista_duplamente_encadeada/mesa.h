@@ -1,110 +1,202 @@
 #ifndef L_D_E_MESA_H
 #define L_D_E_MESA_H
-    #define TAM_JOGADORES 4
     #include "jogador.h"
     #include <iostream>
     using namespace std;
 
+    struct NoJogador {
+        Jogador dados;
+        NoJogador* eloAnt = nullptr;
+        NoJogador* eloProx = nullptr;
+    };
+
     struct Mesa{
-        Jogador jogadores[TAM_JOGADORES];
-        int ultimo = -1;
+        NoJogador *comeco = nullptr;
+        NoJogador *fim = nullptr;
+        int tamanho = 0;
 
         //Inicializar lista
         bool inicializar(){
-            ultimo = -1;
-
+            while(comeco != nullptr) {
+                NoJogador* temp = comeco;
+                comeco = comeco->eloProx;
+                delete temp;
+            }
+            comeco = nullptr;
+            fim = nullptr;
+            tamanho = 0;
             return true;
         };
 
         //Inserir na lista (início, posição, fim);
         bool inserir(Jogador jogador,bool ordenar = false){
-            int index = ultimo + 1;
-
-            //verifica se o tamanho do vetor e maior que o maximo
-            if(index >= TAM_JOGADORES){
-                return false;
-            }
+            NoJogador *nova = new NoJogador;
+            
+            nova->dados = jogador;
+            nova->eloAnt = nullptr;
+            nova->eloProx = nullptr;
+            
             // Lista vazia
-            if(ultimo == -1){
-                jogadores[0] = jogador;
-            }
-            // Inserir ordenado
-            else if(ordenar){
-                int ultimoIndex = ultimo;
-                while(ultimoIndex != -1){
-                    if(jogadores[ultimoIndex].nome > jogador.nome){
-                        jogadores[ultimoIndex + 1] = jogadores[ultimoIndex];
-                        ultimoIndex--;
-                    }else{
-                        jogadores[ultimoIndex + 1] = jogador;
-                        ultimoIndex = -1;
-                    }
-                }
-            }
-            // Inserir sem ordenar
-            else{
-                jogadores[index] = jogador;
+            if(comeco == nullptr){
+                comeco = nova;
+                fim = nova;
+                tamanho += 1;
+                return true;
             }
 
-            ultimo = index;
-            return true;
+            if(ordenar){
+
+                // Inserção no começo (novo valor é o maior)
+                if(jogador.nome > comeco->dados.nome){
+                    nova->eloProx = comeco;
+                    comeco->eloAnt = nova;
+                    comeco = nova;
+                    tamanho += 1;
+                    return true;
+                }
+
+                // Inserção no final (novo valor é o menor)
+                if(jogador.nome < fim->dados.nome){
+                    fim->eloProx = nova;
+                    nova->eloAnt = fim;
+                    fim = nova;
+                    tamanho += 1;
+                    return true;
+                }
+
+                // Inserção no meio da lista
+                NoJogador *atual = comeco;
+                while(atual->eloProx != nullptr && atual->eloProx->dados.nome > jogador.nome){
+                    atual = atual->eloProx;
+                }
+                
+                // Insere nova depois de atual
+                nova->eloProx = atual->eloProx;
+                if (atual->eloProx != nullptr) {
+                    atual->eloProx->eloAnt = nova;
+                }
+                atual->eloProx = nova;
+                nova->eloAnt = atual;
+                
+                tamanho += 1;
+                return true;
+            }else{
+                // Inserção não ordenada (sempre no fim)
+                fim->eloProx = nova;
+                nova->eloAnt = fim;
+                fim = nova;
+                tamanho += 1;
+                return true;
+            }
+            return false;
         };
 
         // Remover da lista (início, posição, fim);
         bool remover(Jogador jogador){
-            //busca o index do item
-            int index = buscar(jogador);
+            NoJogador* aux = localizar(jogador);
 
-            //caso achado item remove ele da lista
-            if( index != -1 ){
-                for( int i = index; i < ultimo; i++ ){
-                    jogadores[i] = jogadores[i+1];
-                }
-                ultimo--;
+            if(aux == nullptr){
+                return false;
+            }
 
+            // Unico elemento
+            if(aux == comeco && aux == fim){
+                comeco = nullptr;
+                fim = nullptr;
+                delete aux;
+                tamanho -= 1;
                 return true;
             }
 
-            return false;
+            // Retirando o primeiro
+            if( aux == comeco ){
+                comeco = aux->eloProx;
+                comeco->eloAnt = nullptr;
+                delete aux;
+                tamanho -= 1;
+                return true;
+            }
+
+            NoJogador *ant = aux->eloAnt;
+            // Retirando o ultimo
+            if( aux == fim ){
+                ant->eloProx = nullptr;
+                fim = ant;
+                delete aux;
+                tamanho -= 1;
+                return true;
+            }
+            // Retirando do meio
+            NoJogador *prox = aux->eloProx;
+            ant->eloProx = prox;
+            prox->eloAnt = ant;
+            delete aux;
+            tamanho -= 1;
+            return true;
         };
 
         //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir);
         Jogador& pegar(int index){
-            if(index <= ultimo && index >= 0){
-                return jogadores[index];
+            NoJogador *referencia = comeco;
+
+            //Eveita bugs
+            if (index < 0 || index >= tamanho || comeco == nullptr) {
+                return comeco->dados;
             }
-            return jogadores[0];
+
+            if(index == 0){
+                return referencia->dados;
+            }
+            
+            for(int i = 0; i < index; i++){
+                referencia = referencia->eloProx;
+            }
+
+            return referencia->dados;
         };
 
-        //Contém item – recebe o dado e verifica se ele está na lista. Se estiver, retorna verdadeiro, falso caso contrário;
-        bool localizar(Jogador jogador){
-            for( int i=0; i <= ultimo; i++ ){
-                if( jogadores[i].nome == jogador.nome){
-                    return true;
+        //Contém item – recebe o dado e verifica se ele está na lista. Se estiver, retorna verdadeiro e falso caso contrário
+        //(foi alterado para retornar o no para ser usado no remover)
+        NoJogador* localizar(Jogador jogador){
+            NoJogador *aux = comeco;
+
+            while( aux != nullptr ){
+                if( aux->dados.nome == jogador.nome){
+                    return aux;
                 }
+                aux = aux->eloProx;
             }
-            return false;
+            return nullptr;
         };
 
         //Descobrir índice – recebe o dado e busca-o na lista. Se estiver na lista, retorna à posição do dado na lista, caso contrário, retorna -1.
         int buscar(Jogador jogador){
+            NoJogador* atual = comeco;
+            int index = 0;
+
             //passa por todos os valores para ver se esta la
-            for( int i=0; i <= ultimo; i++ ){
-                if( jogadores[i].nome == jogador.nome){
-                    return i;
+            while (atual != nullptr) {
+                if (atual->dados.nome == jogador.nome) {
+                    // Encontrou, retorna o índice
+                    return index; 
                 }
+                atual = atual->eloProx;
+                index++;
             }
 
-            //item nao encontrado
-            return -1;
+            // Não encontrou
+            return -1; 
         };
 
         //Imprimir lista
         void imprimir(){
-            cout << "Imprimindo jogadores na mesa:\n";
-            for( int i=0; i <= ultimo; i++ ){
-                cout << jogadores[i].nome << " " << ((i == ultimo) ? "\n" : "");
+            cout << "Imprimindo cartas do baralho:\n";
+            NoJogador* atual = comeco;
+            while(atual != nullptr){
+                cout << atual->dados.nome << " | ";
+                atual = atual->eloProx;
             }
+            cout << "\n";
         };
     };
 #endif

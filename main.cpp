@@ -5,7 +5,7 @@
 // 1 = Lista Estática
 // 2 = Lista Encadeada Simples
 // 3 = Lista Duplamente Encadeada
-#define TIPO_LISTA 2
+#define TIPO_LISTA 3
 #include <iostream>
 #include <string>
 // #include <windows.h>
