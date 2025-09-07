@@ -1,6 +1,5 @@
 #ifndef L_E_S_BARALHO_H
 #define L_E_S_BARALHO_H
-    #define TAM_BARALHO 40
     #include "carta.h"
     #include <iostream>
     #include <string>
@@ -12,9 +11,10 @@
     };
 
     struct Baralho{
-        NoCarta *comeco, *fim;
+        NoCarta *comeco = nullptr, *fim = nullptr;
         int tamanho = 0;
-
+        
+        //Inicializar lista
         bool iniciar(){
             while(comeco != nullptr) {
                 NoCarta* temp = comeco;
@@ -86,11 +86,9 @@
             NoCarta *anterior = nullptr, *referencia = comeco;
             
             // Busca elemento
-            while(referencia != nullptr){
-                if(carta.numero != referencia->dados.numero || carta.nipe != referencia->dados.nipe){
-                    anterior = referencia;
-                    referencia = referencia->elo;
-                };
+            while(referencia != nullptr && (carta.numero != referencia->dados.numero || carta.nipe != referencia->dados.nipe)){
+                anterior = referencia;
+                referencia = referencia->elo;
             }
 
             // Elemento não encontrado
@@ -98,29 +96,22 @@
                 return false;
             };
 
-            // Unico elemento
-            if(referencia == comeco && referencia == fim){
-                comeco = nullptr;
-                fim = nullptr;
-                delete referencia;
-                return true;
+            // Removendo o primeiro
+            if(referencia == comeco){
+                comeco = referencia->elo;
+            } 
+            // Removendo do meio ou fim
+            else{
+                anterior->elo = referencia->elo;
+            }
+            
+            // Se removeu o último, atualiza o ponteiro
+            if(referencia == fim){ 
+                fim = anterior;
             }
 
-            // Retirando o primeiro elemento
-            if( referencia == comeco ){
-                comeco = referencia->elo;
-                delete referencia;
-                return true;
-            }
-            if( referencia == fim ){ //Retirando o ultimo
-                anterior->elo = nullptr;
-                fim = anterior;
-                delete referencia;
-                return true;
-            }
-            // Retirando do meio
-            anterior->elo = referencia->elo;
             delete referencia;
+            tamanho--;
             return true;
         };
         
@@ -158,7 +149,7 @@
         int buscar(Carta carta){
             NoCarta* atual = comeco;
             int index = 0;
-            
+
             while (atual != nullptr) {
                 if (atual->dados.nipe == carta.nipe && atual->dados.numero == carta.numero) {
                     // Encontrou, retorna o índice
@@ -199,50 +190,55 @@
 
         // Função para embaralhar as cartas do baralho
         void embaralhar(){
-            if (tamanho >= 2) {
-                NoCarta* referenciaComeco = nullptr;
-                NoCarta* referenciaFim = nullptr;
-                int index = tamanho;
-    
-                for (int i = 0; i < tamanho; i++) {
-                    // índice aleatório do que resta da lista original
-                    int k = rand() % index;
-    
-                    // remove o nó da lista original
-                    NoCarta* anterior = nullptr;
-                    NoCarta* atual = comeco;
-                    for (int j = 0; j < k; j++) {
-                        anterior = atual;
-                        atual = atual->elo;
-                    }
-    
-                    //nó da lista original
-                    if (anterior == nullptr) { 
-                        //primeiro elemento
-                        comeco = atual->elo;
-                    } else {
-                        anterior->elo = atual->elo;
-                    }
-    
-                    //nó removido ao final da nova lista embaralhada
-                    atual->elo = nullptr; // Isola o nó
-                    if (referenciaComeco == nullptr) { 
-                        // Nova lista está vazia
-                        referenciaComeco = atual;
-                        referenciaFim = atual;
-                    } else {
-                        referenciaFim->elo = atual;
-                        referenciaFim = atual;
-                    }
-    
-                    index--;
-                }
-    
-                // nova lista embaralhada se torna a lista do baralho
-                comeco = referenciaComeco;
-                fim = referenciaFim;
+            // Não é possível embaralhar 0 ou 1 carta
+            if (tamanho < 2) {
+                return;
             }
 
+            NoCarta* baralhoEmbaralhado = nullptr; // O início da nova lista
+            int contagemAtual = tamanho;
+
+            // Loop que executa 'tamanho' vezes: a cada iteração, um nó aleatório
+            // da lista original é movido para a nova lista embaralhada.
+            for (int i = 0; i < tamanho; i++) {
+                // 1. Escolhe uma posição aleatória na lista original restante
+                int posAleatoria = rand() % contagemAtual;
+
+                // 2. Encontra e remove o nó dessa posição
+                NoCarta* anterior = nullptr;
+                NoCarta* atual = comeco;
+                for (int j = 0; j < posAleatoria; j++) {
+                    anterior = atual;
+                    atual = atual->elo;
+                }
+
+                // Desconecta o nó da lista original
+                if (anterior == nullptr) { // Se for o primeiro elemento
+                    comeco = atual->elo;
+                } else {
+                    anterior->elo = atual->elo;
+                }
+
+                // 3. Insere o nó removido no início da nova lista
+                atual->elo = baralhoEmbaralhado;
+                baralhoEmbaralhado = atual;
+
+                contagemAtual--; // Diminui o contador para a próxima iteração
+            }
+
+            // 4. A nova lista embaralhada torna-se a lista oficial do baralho
+            this->comeco = baralhoEmbaralhado;
+
+            // 5. Reconstrói o ponteiro 'fim', pois não sabemos qual é o último nó
+            if (this->comeco != nullptr) {
+                NoCarta* noAtual = this->comeco;
+                while (noAtual->elo != nullptr) {
+                    noAtual = noAtual->elo;
+                }
+                this->fim = noAtual;
+            } else {
+                this->fim = nullptr; // A lista está vazia
+            }
         };
 
     };

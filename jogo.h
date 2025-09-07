@@ -128,9 +128,11 @@ void selecionarJogador(int &players){
 
 bool jogo(int jogadores){
     
+    cout << "Jogo iniciado \n";
     Mesa mesa;
     Baralho baralho;
 
+    cout << "Iniciando mesa \n";
     mesa.inicializar();
     cout << "Mesa iniciada \n";
     //adiciona os jogadores a mesa
@@ -152,8 +154,10 @@ bool jogo(int jogadores){
 
         // Antes de distribuir novas cartas, é preciso resetar a mão de cada jogador.
         for (int i = 0; i < jogadores; i++){
+            cout << "jogador:" << mesa.pegar(i).nome << "\n";
             mesa.pegar(i).mao.inicializar();
         }
+        cout << "Mao dos jogadores inicializada \n";
 
         baralho.embaralhar();
         cout << "Baralho embaralhado \n";
@@ -192,7 +196,7 @@ bool jogo(int jogadores){
                 Jogador& jogador = mesa.pegar(i);
                 cout << "Vez do jogador:" << jogador.nome << " \n";
                 int numCartasNaMao = jogador.mao.contar();
-                cout << numCartasNaMao << "index carta \n";
+                cout << "index carta: " << numCartasNaMao << " \n";
                 Carta carta = jogador.mao.pegar(rand() % numCartasNaMao);
                 cout << "pegou a carta:" << carta.label << " \n";
                 //se for o primeiro ele esta ganhando
@@ -214,7 +218,9 @@ bool jogo(int jogadores){
                 }
                 cout << "O jogador jogou a carta:" << carta.label << " \n";
                 baralho.inserir(carta);
+                cout << "Carta devolvida para o baralho\n";
                 jogador.mao.remover(carta);
+                cout << "Carta removida da mao do jogador\n";
                 jogador.mao.imprimir();
             }
 

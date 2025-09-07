@@ -1,115 +1,193 @@
 #ifndef L_E_S_JOGADOR_H
 #define L_E_S_JOGADOR_H
-    #define TAM_MAO 3
-    #include "carta.h"
+    #include "baralho.h"
     #include <iostream>
     using namespace std;
 
     struct Mao{
-        Carta cartas[TAM_MAO];
-        int ultimo = -1;
+        NoCarta *comeco = nullptr, *fim = nullptr;
+        int tamanho = 0;
 
         //Inicializar lista
         bool inicializar(){
-            ultimo = -1;
-
+            while(comeco != nullptr) {
+                NoCarta* temp = comeco;
+                comeco = comeco->elo;
+                delete temp;
+            }
+            comeco = nullptr;
+            fim = nullptr;
+            tamanho = 0;
             return true;
         };
-
+        
         //Inserir na lista (início, posição, fim);
-        bool inserir(Carta carta,bool ordenar = false){
-            int index = ultimo + 1;
-
-            //verifica se o tamanho do vetor e maior que o maximo
-            if(index >= TAM_MAO){
+        bool inserir(Carta carta,bool ordenado = false){
+            NoCarta *nova = new NoCarta;
+            if(nova == nullptr){
                 return false;
-            }
-            // Lista vazia
-            if(ultimo == -1){
-                cartas[0] = carta;
-            }
-            // Inserir ordenado
-            else if(ordenar){
-                int ultimoIndex = ultimo;
-                while(ultimoIndex != -1){
-                    if(cartas[ultimoIndex].numero > carta.numero){
-                        cartas[ultimoIndex + 1] = cartas[ultimoIndex];
-                        ultimoIndex--;
-                    }else{
-                        cartas[ultimoIndex + 1] = carta;
-                        ultimoIndex = -1;
-                    }
-                }
-            }
-            // Inserir sem ordenar
-            else{
-                cartas[index] = carta;
-            }
+            };
+            
+            nova->dados = carta;
+            nova->elo = nullptr;
 
-            ultimo = index;
-            return true;
-        };
-
-        // Remover da lista (início, posição, fim); 
-        bool remover(Carta carta){
-            //busca o index do item
-            int index = buscar(carta);
-
-            //caso achado item remove ele da lista
-            if( index != -1 ){
-                for( int i = index; i < ultimo; i++ ){
-                    cartas[i] = cartas[i+1];
-                }
-                ultimo--;
-                
-                return true;
-            } 
-
-            return false;
-        };
-
-        //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir);
-        Carta& pegar(int index){
-            if(index <= ultimo && index >= 0){
-                return cartas[index];
-            }
-            return cartas[0];
-        };
-
-        //Contém item – recebe o dado e verifica se ele está na lista. Se estiver, retorna verdadeiro, falso caso contrário; 
-        bool localizar(Carta carta){
-            for( int i=0; i <= ultimo; i++ ){
-                if( cartas[i].nipe == carta.nipe && cartas[i].numero == carta.numero){
+            if(ordenado){
+                if(comeco == nullptr){ // Lista vazia
+                    comeco = nova;
+                    fim = nova;
+                    tamanho += 1;
                     return true;
                 }
+    
+                if(carta.numero < comeco->dados.numero){ // Inser��o no come�o
+                    nova->elo = comeco;
+                    comeco = nova;
+                    tamanho += 1;
+                    return true;
+                }
+    
+                if(carta.numero > fim->dados.numero){ // Inser��o no final
+                    fim->elo = nova;
+                    fim = nova;
+                    tamanho += 1;
+                    return true;
+                }
+    
+                // Inser��o no meio da lista
+                NoCarta *ant = comeco;
+                NoCarta *prox = ant->elo;
+                
+                while(prox != nullptr){
+                    if(ant->dados.numero < carta.numero && carta.numero < prox->dados.numero){
+                        ant->elo = nova;
+                        nova->elo = prox;
+                        tamanho += 1;
+                        return true;
+                    }
+                    ant = prox;
+                    prox = ant->elo;
+                }
+            }else{
+                if(comeco == nullptr){ // Lista est� vazia
+                    comeco = nova;
+                    fim = nova;
+                }else{
+                    fim->elo = nova;
+                    fim = nova;
+                }
+                tamanho += 1;
+                return true;
             }
             return false;
         };
-
-        //Descobrir índice – recebe o dado e busca-o na lista. Se estiver na lista, retorna à posição do dado na lista, caso contrário, retorna -1.
-        int buscar(Carta carta){
-            //passa por todos os valores para ver se esta la
-            for( int i=0; i <= ultimo; i++ ){
-                if( cartas[i].nipe == carta.nipe && cartas[i].numero == carta.numero){
-                    return i;
-                }
+        
+        //Remover da lista
+        bool remover(Carta carta){
+            NoCarta *anterior = nullptr, *referencia = comeco;
+            
+            // Busca elemento
+            while(referencia != nullptr && (referencia->dados.numero != carta.numero || referencia->dados.nipe != carta.nipe)){
+                anterior = referencia;
+                referencia = referencia->elo;
             }
 
-            //item nao encontrado
-            return -1;
+            // Elemento não encontrado
+            if(referencia == nullptr) {
+                return false;
+            };
+
+            // Unico elemento
+            if(referencia == comeco && referencia == fim){
+                comeco = nullptr;
+                fim = nullptr;
+                delete referencia;
+                tamanho -= 1;
+                return true;
+            }
+
+            // Retirando o primeiro elemento
+            if( referencia == comeco ){
+                comeco = referencia->elo;
+                delete referencia;
+                tamanho -= 1;
+                return true;
+            }
+            if( referencia == fim ){ //Retirando o ultimo
+                anterior->elo = nullptr;
+                fim = anterior;
+                delete referencia;
+                tamanho -= 1;
+                return true;
+            }
+            // Retirando do meio
+            anterior->elo = referencia->elo;
+            delete referencia;
+            tamanho -= 1;
+            return true;
+        };
+        
+        //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir)
+        Carta& pegar(int index){
+            // evitar bug de informar index invalido
+            if (index < 0 || index >= tamanho || comeco == nullptr) {
+                return comeco->dados;
+            }
+
+            NoCarta *referencia = comeco;
+
+            for(int i = 0; i < index; i++){
+                referencia = referencia->elo;
+            }
+            
+            return referencia->dados;
+        };
+
+        //Contém item – recebe o dado e verifica se ele está na lista. Se estiver, retorna verdadeiro e falso caso contrário
+        bool localizar(Carta carta){
+            NoCarta* atual = comeco;
+            while (atual != nullptr) {
+                if (atual->dados.nipe == carta.nipe && atual->dados.numero == carta.numero) {
+                    // Encontrou
+                    return true;
+                }
+                atual = atual->elo;
+            }
+            // Não encontrou
+            return false;
+        };
+        
+        //Descobrir índice – recebe o dado e busca-o na lista. Se estiver na lista, retorna à posição do dado na lista, caso contrário, retorna -1
+        int buscar(Carta carta){
+            NoCarta* atual = comeco;
+            int index = 0;
+
+            while (atual != nullptr) {
+                if (atual->dados.nipe == carta.nipe && atual->dados.numero == carta.numero) {
+                    // Encontrou, retorna o índice
+                    return index; 
+                }
+                atual = atual->elo;
+                index++;
+            }
+
+            // Não encontrou
+            return -1; 
         };
 
         //Imprimir lista
         void imprimir(){
-            cout << "Imprimindo cartas na mao do jogador:\n";
-            for( int i=0; i <= ultimo; i++ ){
-                cout << cartas[i].label << " "<< ((i == ultimo) ? "\n" : "");
+            cout << "Imprimindo cartas da mao:\n";
+            NoCarta* atual = comeco;
+            while(atual != nullptr){
+                cout << atual->dados.label << " | ";
+                atual = atual->elo;
             }
+            cout << endl;
         };
 
-        //contar
+        //Contar itens da lista
         int contar(){
-            return ultimo + 1;
+            return tamanho;
         };
 
     };

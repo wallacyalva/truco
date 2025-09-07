@@ -1,110 +1,190 @@
 #ifndef L_D_E_BARALHO_H
 #define L_D_E_BARALHO_H
-    #define TAM_BARALHO 40
     #include "carta.h"
     #include <iostream>
     #include <string>
     using namespace std;
+    
+    struct NoCarta {
+        Carta dados;
+        NoCarta* eloAnt = nullptr;
+        NoCarta* eloProx = nullptr;
+    };
 
     struct Baralho{
-        Carta Cartas[TAM_BARALHO];
-        int ultimo = -1;
+        NoCarta *comeco = nullptr;
+        NoCarta *fim = nullptr;
+        int tamanho = 0;
 
+        // Inicializar lista
         bool iniciar(){
-            ultimo = -1;
-
+            NoCarta* atual = comeco;
+            while (atual != nullptr) {
+                NoCarta* proximo = atual->eloProx;
+                delete atual;
+                atual = proximo;
+            }
+            comeco = nullptr;
+            fim = nullptr;
+            tamanho = 0;
             return true;
         };
         
+        //Inserir na lista
         bool inserir(Carta carta,bool ordenar = false){
-            int index = ultimo + 1;
+            NoCarta *nova = new NoCarta;
+            
+            nova->dados = carta;
+            nova->eloAnt = nullptr;
+            nova->eloProx = nullptr;
 
-            //verifica se o tamanho do vetor e maior que o maximo
-            if(index >= TAM_BARALHO){
-                return false;
-            }
-            // Lista vazia
-            if(ultimo == -1){
-                Cartas[0] = carta;
-            }
-            // Inserir ordenado
-            else if(ordenar){
-                int ultimoIndex = ultimo;
-                while(ultimoIndex != -1){
-                    if(Cartas[ultimoIndex].numero > carta.numero){
-                        Cartas[ultimoIndex + 1] = Cartas[ultimoIndex];
-                        ultimoIndex--;
-                    }else{
-                        Cartas[ultimoIndex + 1] = carta;
-                        ultimoIndex = -1;
-                    }
+            if(ordenar){
+                
+                if(comeco == nullptr){ // Lista vazia
+                    comeco = nova;
+                    fim = nova;
+                    return true;
                 }
-            }
-            // Inserir sem ordenar
-            else{
-                Cartas[index] = carta;
-            }
+                
+                if(carta.numero > comeco->dados.numero){ // Inser��o no come�o
+                    nova->eloProx = comeco;
+                    comeco->eloAnt = nova;
+                    comeco = nova;
+                    return true;
+                }
 
-            ultimo = index;
-            return true;
+                if(carta.numero < fim->dados.numero){ // Inser��o no final
+                    fim->eloProx = nova;
+                    nova->eloAnt = fim;
+                    fim = nova;
+                    return true;
+                }
+
+                // Inser��o no meio da lista
+                NoCarta *ant = comeco;
+                NoCarta *prox = ant->eloProx;
+                while(prox != nullptr){
+                    if(ant->dados.numero > carta.numero && carta.numero > prox->dados.numero){
+                        ant->eloProx = nova;
+                        nova->eloAnt = ant;
+                        prox->eloAnt = nova;
+                        nova->eloProx = prox;
+                        return true;
+                    }
+                    ant = prox;
+                    prox = ant->eloProx;
+                }
+            }else{
+                if(comeco == nullptr){ // Lista est� vazia
+                    comeco = nova;
+                    fim = nova;
+                }else{
+                    fim->eloAnt = nova;
+                    nova->eloProx = fim;
+                    fim = nova;
+                }
+
+                return true;
+            }
+            return false;
         };
         
         //Remover da lista
         bool remover(Carta carta){
-            //busca o index do item
-            int index = buscar(carta);
+            NoCarta* aux = localizar(carta);
 
-            //caso achado item remove ele da lista
-            if( index != -1 ){
-                for( int i = index; i < ultimo; i++ ){
-                    Cartas[i] = Cartas[i+1];
-                }
-                ultimo--;
-                
+            if(aux == nullptr){
+                return false;
+            }
+
+            // Unico elemento
+            if(aux == comeco && aux == fim){
+                comeco = nullptr;
+                fim = nullptr;
+                delete aux;
                 return true;
-            } 
+            }
+            // Retirando o primeiro
+            if( aux == comeco ){
+                comeco = aux->eloProx;
+                comeco->eloAnt = nullptr;
+                delete aux;
+                return true;
+            }
 
-            return false;
+            NoCarta *ant = aux->eloAnt;
+            // Retirando o ultimo
+            if( aux == fim ){
+                ant->eloProx = nullptr;
+                fim = ant;
+                delete aux;
+                return true;
+            }
+            // Retirando do meio
+            NoCarta *prox = aux->eloProx;
+            ant->eloProx = prox;
+            prox->eloAnt = ant;
+            delete aux;
+            return true;
         };
         
         //Obter item da lista – recebe a posição como parâmetro e retorna o dado daquela posição (se existir)
         Carta& pegar(int index){
-            if(index <= ultimo && index >= 0){
-                return Cartas[index];
+            NoCarta *referencia = comeco;
+            if(index == 0){
+                return referencia->dados;
             }
-            return Cartas[0];
+            
+            int indexReferencia = 0;
+
+            while(indexReferencia != index){
+                referencia = referencia->eloProx;
+            }
+
+            return referencia->dados;
         };
         
         //Contém item – recebe o dado e verifica se ele está na lista. Se estiver, retorna verdadeiro e falso caso contrário
-        bool localizar(Carta carta){
-            for( int i=0; i <= ultimo; i++ ){
-                if( Cartas[i].nipe == carta.nipe && Cartas[i].numero == carta.numero){
-                    return true;
+        //(foi alterado para retornar o no para ser usado no remover)
+        NoCarta* localizar(Carta carta){
+            NoCarta *aux = comeco;
+
+            while( aux != nullptr ){
+                if( aux->dados.nipe == carta.nipe && aux->dados.numero == carta.numero){
+                    return aux;
                 }
+                aux = aux->eloProx;
             }
-            return false;
+            return nullptr;
         };
         
         //Descobrir índice – recebe o dado e busca-o na lista. Se estiver na lista, retorna à posição do dado na lista, caso contrário, retorna -1
         int buscar(Carta carta){
-            //passa por todos os valores para ver se esta la
-            for( int i=0; i <= ultimo; i++ ){
-                if( Cartas[i].nipe == carta.nipe && Cartas[i].numero == carta.numero){
-                    return i;
+            NoCarta* atual = comeco;
+            int index = 0;
+
+            while (atual != nullptr) {
+                if (atual->dados.nipe == carta.nipe && atual->dados.numero == carta.numero) {
+                    // Encontrou, retorna o índice
+                    return index; 
                 }
+                atual = atual->eloProx;
+                index++;
             }
 
-            //item nao encontrado
-            return -1;
+            // Não encontrou
+            return -1; 
         };
 
         //Imprimir lista
         void imprimir(){
             cout << "Imprimindo cartas do baralho:\n";
-            for( int i=0; i <= ultimo; i++ ){
-                cout << Cartas[i].label << " " << ((i == ultimo) ? "\n" : "");
+            NoCarta* atual = comeco;
+            while(atual != nullptr){
+                cout << atual->dados.label << " | ";
+                atual = atual->eloProx;
             }
-            
+            cout << "\n";
         };
 
         void gerarCartas(){
@@ -123,21 +203,48 @@
 
         // Função para embaralhar as cartas do baralho
         void embaralhar(){
-            // Não é possível embaralhar 0 ou 1 carta
-            if (ultimo < 1) {
-                return;
-            }
-
-
-            // Percorre o baralho do final até o segundo elemento
-            for (int i = ultimo; i > 0; i--) {
-                // Escolhe um índice aleatório
-                int j = rand() % (i + 1);
-
-                // Troca a carta da posição
-                Carta temp = Cartas[i];
-                Cartas[i] = Cartas[j];
-                Cartas[j] = temp;
+            if (tamanho >= 2) {
+                NoCarta* referenciaComeco = nullptr;
+                NoCarta* referenciaFim = nullptr;
+                int index = tamanho;
+    
+                for (int i = 0; i < tamanho; i++) {
+                    // índice aleatório do que resta da lista original
+                    int k = rand() % index;
+    
+                    // remove o nó da lista original
+                    NoCarta* anterior = nullptr;
+                    NoCarta* atual = comeco;
+                    for (int j = 0; j < k; j++) {
+                        anterior = atual;
+                        atual = atual->eloProx;
+                    }
+    
+                    //nó da lista original
+                    if (anterior == nullptr) { 
+                        //primeiro elemento
+                        comeco = atual->eloProx;
+                    } else {
+                        anterior->eloProx = atual->eloProx;
+                    }
+    
+                    //nó removido ao final da nova lista embaralhada
+                    atual->eloProx = nullptr; // Isola o nó
+                    if (referenciaComeco == nullptr) { 
+                        // Nova lista está vazia
+                        referenciaComeco = atual;
+                        referenciaFim = atual;
+                    } else {
+                        referenciaFim->eloProx = atual;
+                        referenciaFim = atual;
+                    }
+    
+                    index--;
+                }
+    
+                // nova lista embaralhada se torna a lista do baralho
+                comeco = referenciaComeco;
+                fim = referenciaFim;
             }
         };
 
