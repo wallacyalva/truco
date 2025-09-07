@@ -1,10 +1,18 @@
-#include "jogo.h"
+// feito por:
+// Daniel Uesler de Brito (daniel.8071330@edu.univali.br) - 8071330
+// Wallacy Alvarenga (wallacyalvarenga@univali.br) - 6916694
+// Mude o valor abaixo para escolher a implementação da lista
+// 1 = Lista Estática
+// 2 = Lista Encadeada Simples
+// 3 = Lista Duplamente Encadeada
+#define TIPO_LISTA 2
 #include <iostream>
 #include <string>
 // #include <windows.h>
 #include <cstdlib>
 #include <ctime>
 using namespace std;
+#include "jogo.h"
 
 int main() {
     // SetConsoleOutputCP(65001);
