@@ -8,14 +8,14 @@
 #define TIPO_LISTA 3
 #include <iostream>
 #include <string>
-// #include <windows.h>
+#include <windows.h>
 #include <cstdlib>
 #include <ctime>
 using namespace std;
 #include "jogo.h"
 
 int main() {
-    // SetConsoleOutputCP(65001);
+    SetConsoleOutputCP(65001);
     srand(time(NULL)); // Inicializa o gerador de números aleatórios
     int opcoes = 0,jogadores = 2;
     do{
